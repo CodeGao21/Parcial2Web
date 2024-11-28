@@ -1,5 +1,5 @@
-import { ClaseEntity } from 'src/clase/clase.entity';
-import { UsuarioEntity } from 'src/usuario/usuario.entity';
+import { ClaseEntity } from '../clase/clase.entity';
+import { UsuarioEntity } from '../usuario/usuario.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

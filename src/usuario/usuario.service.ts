@@ -3,13 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UsuarioEntity } from './usuario.entity';
 import { Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { BonoEntity } from '../bono/bono.entity';
 
 @Injectable()
 export class UsuarioService {
 
     constructor(
         @InjectRepository(UsuarioEntity)
-        private readonly usuarioRepository: Repository<UsuarioEntity>
+        private readonly usuarioRepository: Repository<UsuarioEntity>,
+
+        @InjectRepository(BonoEntity)
+        private readonly bonoRepository: Repository<BonoEntity>
     ) {}
 
     async crearUsuario(usuario: UsuarioEntity): Promise<UsuarioEntity> {
@@ -59,4 +63,26 @@ export class UsuarioService {
         // Eliminar el usuario
         await this.usuarioRepository.remove(usuario);
     }
+
+    // Método para asociar un bono a un usuario
+    async asociarBonoAUsuario(usuarioId: number, bonoId: number): Promise<UsuarioEntity> {
+        // Buscar al usuario por su ID
+        const usuario = await this.usuarioRepository.findOne({ where: { id: usuarioId }, relations: ['bonos'] });
+        if (!usuario) {
+        throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+        }
+
+        // Buscar el bono por su ID
+        const bono = await this.bonoRepository.findOne({ where: { id: bonoId } });
+        if (!bono) {
+        throw new HttpException('Bono no encontrado', HttpStatus.NOT_FOUND);
+        }
+
+        // Asociar el bono al usuario
+        usuario.bonos.push(bono);
+
+        // Guardar el usuario con el bono asociado
+        return await this.usuarioRepository.save(usuario);
+  }
+
 }

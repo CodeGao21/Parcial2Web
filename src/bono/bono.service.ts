@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BonoEntity } from './bono.entity';
 import { Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { UsuarioEntity } from 'src/usuario/usuario.entity';
-import { ClaseEntity } from 'src/clase/clase.entity';
+import { UsuarioEntity } from '../usuario/usuario.entity';
+import { ClaseEntity } from '../clase/clase.entity';
 
 @Injectable()
 export class BonoService {
@@ -12,10 +12,12 @@ export class BonoService {
     constructor(
         @InjectRepository(BonoEntity)
         private readonly bonoRepository: Repository<BonoEntity>,
+
         @InjectRepository(UsuarioEntity)
         private readonly usuarioRepository: Repository<UsuarioEntity>,
+
         @InjectRepository(ClaseEntity)
-        private readonly claseRepository: Repository<ClaseEntity>
+        private readonly claseRepository: Repository<ClaseEntity>,
     ) {}
 
     // Método para crear un bono
