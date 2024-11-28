@@ -6,5 +6,6 @@ export function BusinessLogicException(message: string, type: number) {
   export enum BusinessError {
     NOT_FOUND,
     PRECONDITION_FAILED,
-    BAD_REQUEST
+    BAD_REQUEST,
+    FORBIDDEN,
   }
