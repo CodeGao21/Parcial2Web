@@ -1,0 +1,312 @@
+{
+	"info": {
+		"_postman_id": "bf4759d5-a411-4a20-996b-3cff037c3e17",
+		"name": "Pruebas Usuario",
+		"description": "Esta es la colección de Usuario. IMPORTANTE: Reiniciar el back cada vez que se vaya a probar una colección",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34867910"
+	},
+	"item": [
+		{
+			"name": "Crear Usuario Rol Profesor Grupo Válido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Prueba de creación de usuario con rol Profesor y grupo válido",
+							"pm.test(\"Usuario Profesor creado correctamente con grupo válido\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    const jsonData = pm.response.json();",
+							"    pm.environment.set(\"usuarioIdProfesor\", jsonData.id);",
+							"    console.log(\"ID del Usuario Profesor guardado:\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"cedula\": 123456789,\n  \"nombre\": \"Juan Pérez\",\n  \"grupo\": \"TICSW\",\n  \"extension\": 12345678,\n  \"rol\": \"Profesor\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/usuario",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuario"
+					]
+				},
+				"description": "**Descripción:** Se crea un usuario con el rol \"Profesor\" y un grupo de investigación válido (uno de los grupos permitidos: \"TICSW\", \"IMAGINE\", \"COMIT\").\n\n**Razón de la prueba:** Este caso valida que el sistema permita la creación de un usuario con rol \"Profesor\" solo si el grupo de investigación es uno de los grupos permitidos.\n\n**Resultado Esperado:**\n\n- `201 Created`: El usuario ha sido creado correctamente"
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Usuario Rol Profesor Grupo Inválido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Prueba de creación de usuario con grupo inválido",
+							"pm.test(\"Debe fallar por grupo inválido\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"cedula\": 123456789,\n  \"nombre\": \"Juan Pérez\",\n  \"grupo\": \"INVALIDO\",\n  \"extension\": 12345678,\n  \"rol\": \"Profesor\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/usuario",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuario"
+					]
+				},
+				"description": "**Descripción:** Se intenta crear un usuario con el rol \"Profesor\" y un grupo de investigación no permitido (por ejemplo, \"GRUPO1\").\n\n**Razón de la prueba:** Este caso verifica que el sistema rechace la creación de un usuario con rol \"Profesor\" si el grupo de investigación no está en la lista de grupos permitidos.\n\n**Resultado Esperado:**\n\n- `400 Bad Request`: El grupo de investigación no es válido para un Profesor."
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Usuario Rol Decana Válido (Extensión 8 Dígitos)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Prueba de creación de usuario con rol Decana y extensión válida de 8 dígitos",
+							"pm.test(\"Usuario Decana creado correctamente con extensión válida\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    const jsonData = pm.response.json();",
+							"    pm.environment.set(\"usuarioIdDecana\", jsonData.id);",
+							"    console.log(\"ID del Usuario Decana guardado:\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"cedula\": 987654321,\n  \"nombre\": \"Ana Gómez\",\n  \"grupo\": \"TICSW\",\n  \"extension\": 87654321,\n  \"rol\": \"Decana\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/usuario",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuario"
+					]
+				},
+				"description": "**Descripción:** Se crea un usuario con el rol \"Decana\" y una extensión de 8 dígitos válidos.\n\n**Razón de la prueba:** Este caso asegura que el sistema permita la creación de un usuario con rol \"Decana\" solo si la extensión tiene exactamente 8 dígitos.\n\n**Resultado Esperado:**\n\n- `201 Created`: El usuario ha sido creado correctamente."
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Usuario Rol Decana Extension Inválido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Prueba de creación de usuario con rol Decana y grupo inválido",
+							"pm.test(\"Debe fallar por grupo inválido\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"cedula\": 987654321,\n  \"nombre\": \"Ana Gómez\",\n  \"grupo\": \"INVALIDO\",\n  \"extension\": 87321,\n  \"rol\": \"Decana\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/usuario",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuario"
+					]
+				},
+				"description": "**Descripción:** Se intenta crear un usuario con el rol \"Decana\" y un numero de extensión menor a 8 digitos\n\n**Razón de la prueba:** Este caso verifica que el sistema no permita la creación de un usuario con rol \"Decana\" con una extension inválida.\n\n**Resultado Esperado:**\n\n- `400 Bad Request`: La extensión no es valida para Decana"
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar Usuario por ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Usuario encontrado correctamente por ID\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('id', '{{usuarioIdProfesor}}');",
+							"    console.log(\"Usuario encontrado: \", jsonData);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/usuario/{{usuarioIdProfesor}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuario",
+						"{{usuarioIdProfesor}}"
+					]
+				},
+				"description": "**Descripción:** Se busca un usuario utilizando su ID para verificar que el sistema pueda recuperar correctamente un usuario existente.\n\n**Razón de la prueba:** Este caso valida que el sistema sea capaz de recuperar un usuario utilizando su ID, asegurando que las consultas por ID funcionen correctamente.\n\n**Resultado Esperado:**\n\n- `200 OK`: El usuario fue encontrado correctamente."
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar Usuario con Rol Decana",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Prueba de eliminar un usuario con rol Decana",
+							"pm.test(\"No se debe permitir eliminar un usuario con rol Decana\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/usuario/{{usuarioIdDecana}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuario",
+						"{{usuarioIdDecana}}"
+					]
+				},
+				"description": "**Descripción:** Se intenta eliminar un usuario con rol \"Decana\".\n\n**Razón de la prueba:** Este caso verifica que el sistema impida la eliminación de un usuario con rol \"Decana\", ya que no se permite eliminar este tipo de usuario.\n\n**Resultado Esperado:**\n\n- `403 Forbidden`: No se puede eliminar a un usuario con rol Decana."
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar Usuario con Rol Profesor",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Prueba de eliminar un usuario con rol Profesor",
+							"pm.test(\"Se debe permitir eliminar un usuario con rol Profesor\", function () {",
+							"pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/usuario/{{usuarioIdProfesor}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuario",
+						"{{usuarioIdProfesor}}"
+					]
+				},
+				"description": "**Descripción:** Se intenta eliminar un usuario con rol \"Profesor\" que no tiene un bono asociado.\n\n**Razón de la prueba:** Este caso verifica que el sistema permita la eliminación de un usuario con rol \"Profesor\", siempre y cuando no tenga bonos asociados.\n\n**Resultado Esperado:**\n\n- `200 OK`: El usuario ha sido eliminado correctamente."
+			},
+			"response": []
+		}
+	]
+}

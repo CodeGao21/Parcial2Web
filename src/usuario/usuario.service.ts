@@ -56,7 +56,7 @@ export class UsuarioService {
         }
 
         // Validar si el usuario tiene un bono asociado
-        if (usuario.bonos.length > 0) {
+        if (usuario.bonos) {
             throw new HttpException('El usuario tiene un bono asociado y no puede ser eliminado', HttpStatus.FORBIDDEN);
         }
 

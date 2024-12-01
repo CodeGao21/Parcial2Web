@@ -1,0 +1,418 @@
+{
+	"info": {
+		"_postman_id": "06ea8cde-e88d-49b9-9b01-3e8cbfce36d8",
+		"name": "Pruebas Bono",
+		"description": "Esta es la colección de Bono.\n\nIMPORTANTE: Reiniciar el back cada vez que se vaya a probar una colección",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34867910"
+	},
+	"item": [
+		{
+			"name": "Crear Usuario Profesor",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Prueba de creación de usuario con rol Profesor y grupo válido",
+							"pm.test(\"Usuario Profesor creado correctamente con grupo válido\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    const jsonData = pm.response.json();",
+							"    pm.environment.set(\"usuarioIdProfesor\", jsonData.id);",
+							"    console.log(\"ID del Usuario Profesor guardado:\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"cedula\": 123456789,\n  \"nombre\": \"Juan Pérez\",\n  \"grupo\": \"TICSW\",\n  \"extension\": 12345678,\n  \"rol\": \"Profesor\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/usuario",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuario"
+					]
+				},
+				"description": "**Descripción:**  \nSe crea un usuario con rol \"Profesor\" para poder asociarlo a la creación de un bono.\n\n**Razón de la prueba:**  \nEste caso verifica que el sistema permita la creación de un usuario con rol \"Profesor\" para permitirle realizar operaciones de bonos posteriormente.\n\n**Resultado Esperado:**\n\n**201 Created**: Usuario creado correctamente."
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Clase",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Prueba de creación de clase con código válido",
+							"pm.test(\"Clase creada correctamente\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.response.to.have.status(201);",
+							"    pm.environment.set(\"claseId\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Matemáticas Básicas\",\n  \"codigo\": \"MAT1012345\",\n  \"creditos\": 3,\n  \"usuario\": {\n    \"id\": {{usuarioIdProfesor}}\n  }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/clase",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"clase"
+					]
+				},
+				"description": "**Descripción:**  \nSe crea una clase que estará asociada a los bonos.\n\n**Razón de la prueba:**  \nEste caso asegura que las clases se puedan crear correctamente, lo cual es crucial para asociar un bono a una clase posteriormente.\n\n**Resultado Esperado:**\n\n- **201 Created**: Clase creada correctamente."
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Bono Válido Calificacion +4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar que el Bono se creó correctamente",
+							"pm.test(\"Bono creado correctamente\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    const jsonData = pm.response.json();",
+							"    pm.environment.set(\"bonoId\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"monto\": 100,\n  \"calificacion\": 5,\n  \"palabraclave\": \"descuento\",\n  \"clase\": {\n    \"id\": {{claseId}}\n  },\n  \"usuario\": {\n    \"id\": {{usuarioIdProfesor}}\n  }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/bono",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bono"
+					]
+				},
+				"description": "**Descripción:**  \nSe crea un bono válido con un monto positivo y una calificación superior a 4, asociado a un usuario con rol \"Profesor\" y una clase.\n\n**Razón de la prueba:**  \nEste caso asegura que el servicio maneje correctamente la creación de bonos con valores válidos, y se asocie correctamente a un usuario \"Profesor\" y una clase.\n\n**Resultado Esperado:**\n\n- **201 Created**: Bono creado correctamente."
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Bono Inválido Monto",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Prueba de creación de bono con monto inválido",
+							"pm.test(\"Debe fallar por monto inválido\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"monto\": -100,\n  \"calificacion\": 5,\n  \"palabraclave\": \"descuento\",\n  \"clase\": {\n    \"id\": {{claseId}}\n  },\n  \"usuario\": {\n    \"id\": {{usuarioIdProfesor}}\n  }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/bono",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bono"
+					]
+				},
+				"description": "#### **Crear Bono Inválido con Monto no Válido**\n\n**Descripción:**  \nSe intenta crear un bono con un monto negativo o cero. Este es un caso inválido.\n\n**Razón de la prueba:**  \nEl sistema debe rechazar bonos con un monto no válido, garantizando que no se puedan crear bonos con valores erróneos.\n\n**Resultado Esperado:**\n\n- **400 Bad Request**: El monto del bono no es válido."
+			},
+			"response": []
+		},
+		{
+			"name": "Find Bono by Codigo (Código de Clase)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar que el bono es encontrado por código de clase",
+							"pm.test(\"Debe encontrar el bono correctamente\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('id');",
+							"    pm.expect(jsonData).to.have.property('monto');",
+							"    pm.expect(jsonData).to.have.property('calificacion');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/bono/codigo/MAT1012345",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bono",
+						"codigo",
+						"MAT1012345"
+					]
+				},
+				"description": "**Descripción:**  \nSe realiza una búsqueda de un bono asociado a una clase utilizando el código de la clase.\n\n**Razón de la prueba:**  \nEste caso verifica que el sistema pueda encontrar un bono correctamente a partir del código de la clase asociada.\n\n**Resultado Esperado:**\n\n- **200 OK**: Bono encontrado."
+			},
+			"response": []
+		},
+		{
+			"name": "Find All Bonos by Usuarioid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar que se obtienen todos los bonos del usuario",
+							"pm.test(\"Debe devolver una lista de bonos para el usuario\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"    pm.expect(jsonData.length).to.be.above(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/bono/usuario/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bono",
+						"usuario",
+						"1"
+					]
+				},
+				"description": "**Descripción:**  \nSe realiza una búsqueda de todos los bonos asociados a un usuario específico por su ID.\n\n**Razón de la prueba:**  \nEste caso valida que el servicio pueda retornar todos los bonos asociados a un usuario dado.\n\n**Ejemplo de Petición (GET)**\n\n- **200 OK**: Lista de bonos encontrada."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Bono with Calificacion > 4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar que no se puede eliminar el bono si la calificación es > 4",
+							"pm.test(\"Debe fallar si la calificación es mayor a 4\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/bono/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bono",
+						"2"
+					]
+				},
+				"description": "#### **Delete Bono with Calificacion > 4**\n\n**Descripción:**  \nSe intenta eliminar un bono cuyo valor de calificación es mayor a 4.\n\n**Razón de la prueba:**  \nEste caso debe fallar debido a que no se puede eliminar un bono con una calificación superior a 4.\n\n**Resultado Esperado:**\n\n- **403 Forbidden**: No se puede eliminar el bono."
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Bono Válido Calificacion -4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar que el Bono se creó correctamente",
+							"pm.test(\"Bono creado correctamente\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    const jsonData = pm.response.json();",
+							"    pm.environment.set(\"bonoId\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"monto\": 100,\n  \"calificacion\": 3,\n  \"palabraclave\": \"descuento\",\n  \"clase\": {\n    \"id\": {{claseId}}\n  },\n  \"usuario\": {\n    \"id\": {{usuarioIdProfesor}}\n  }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/bono",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bono"
+					]
+				},
+				"description": "**Descripción:**  \nSe crea un bono válido con un monto positivo y una calificación menor a 4\n\n**Razón de la prueba:**  \nEl caso crea un bono con calificación menor a 4 para poder probar eliminar el bono\n\n**Resultado Esperado:**\n\n- **201 Created**: Bono creado correctamente."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Bono with Calificacion <= 4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar que el bono puede ser eliminado si la calificación es <= 4",
+							"pm.test(\"Debe eliminar el bono correctamente\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/bono/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bono",
+						"1"
+					]
+				},
+				"description": "**Descripción:**  \nSe elimina un bono cuya calificación es menor o igual a 4.\n\n**Razón de la prueba:**  \nEste caso asegura que el sistema permita la eliminación de bonos con calificación igual o menor a 4.\n\n**Resultado Esperado:**\n\n- **200 OK**: Bono eliminado correctamente."
+			},
+			"response": []
+		}
+	]
+}

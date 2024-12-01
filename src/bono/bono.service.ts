@@ -20,26 +20,27 @@ export class BonoService {
         private readonly claseRepository: Repository<ClaseEntity>,
     ) {}
 
-    // Método para crear un bono
-    async crearBono(bono: BonoEntity, usuarioId: number): Promise<BonoEntity> {
-        // Validar que el monto no sea vacío y sea positivo
-        if (!bono.monto || bono.monto <= 0) {
-            throw new HttpException('El monto del bono debe ser positivo y no vacío', HttpStatus.BAD_REQUEST);
+            // Método para crear un bono
+        async crearBono(bono: BonoEntity, usuarioId: number): Promise<BonoEntity> {
+            // Validar que el monto no sea vacío y sea positivo
+            if (!bono.monto || bono.monto <= 0) {
+                throw new HttpException('El monto del bono debe ser positivo y no vacío', HttpStatus.BAD_REQUEST);
+            }
+
+            // Validar que el usuario sea "Profesor"
+            const usuario = await this.usuarioRepository.findOne({ where: { id: usuarioId } });
+            if (!usuario) {
+                throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+            }
+
+            if (usuario.rol !== 'Profesor') {
+                throw new HttpException('El usuario debe tener rol de Profesor para crear un bono', HttpStatus.FORBIDDEN);
+            }
+
+            // Guardar el bono
+            return await this.bonoRepository.save(bono);
         }
 
-        // Validar que el usuario sea "Profesor"
-        const usuario = await this.usuarioRepository.findOneBy({ id: usuarioId });
-        if (!usuario) {
-            throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
-        }
-
-        if (usuario.rol !== 'Profesor') {
-            throw new HttpException('El usuario debe tener rol de Profesor para crear un bono', HttpStatus.FORBIDDEN);
-        }
-
-        // Guardar el bono
-        return await this.bonoRepository.save(bono);
-    }
 
     async findBonoByCodigo(cod: string): Promise<BonoEntity> {
         // Buscar la clase con el código

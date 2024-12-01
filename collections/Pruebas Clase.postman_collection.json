@@ -1,0 +1,242 @@
+{
+	"info": {
+		"_postman_id": "c0d2893a-5105-49f5-9be7-b399853acff4",
+		"name": "Pruebas Clase",
+		"description": "Esta es la colección de Clase. IMPORTANTE: Reiniciar el back cada vez que se vaya a probar una colección",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34867910"
+	},
+	"item": [
+		{
+			"name": "Crear Usuario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Prueba de creación de usuario con rol Profesor y grupo válido",
+							"pm.test(\"Usuario Profesor creado correctamente con grupo válido\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    const jsonData = pm.response.json();",
+							"    pm.environment.set(\"usuarioIdProfesor\", jsonData.id);",
+							"    console.log(\"ID del Usuario Profesor guardado:\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"cedula\": 123456789,\n  \"nombre\": \"Juan Pérez\",\n  \"grupo\": \"TICSW\",\n  \"extension\": 12345678,\n  \"rol\": \"Profesor\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/usuario",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuario"
+					]
+				},
+				"description": "**Descripción:**  \nSe crea un usuario con rol \"Profesor\" para poder asociarlo a la creación de una clase.\n\n**Razón de la prueba:**  \nEste caso verifica que el sistema permita la creación de un usuario con rol \"Profesor\" para permitirle realizar operaciones de clasesposteriormente.\n\n**Resultado Esperado:**\n\n**201 Created**: Usuario creado correctamente."
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Clase Válido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Prueba de creación de clase con código válido",
+							"pm.test(\"Clase creada correctamente\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    pm.environment.set(\"claseId\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Matemáticas Básicas\",\n  \"codigo\": \"MAT1012345\",\n  \"creditos\": 3,\n  \"usuario\": {\n    \"id\": {{usuarioIdProfesor}}\n  }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/clase",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"clase"
+					]
+				},
+				"description": "**Descripción:** Se crea una clase con un código válido de 10 caracteres para asegurar que el sistema permite la creación de clases con códigos correctamente formateados.\n\n**Razón de la prueba:** Este caso valida que el sistema acepte clases con un código de 10 caracteres, permitiendo la correcta creación y almacenamiento de las clases en la base de datos.\n\n**Resultado Esperado:**\n\n- `201 Created`: La clase ha sido creada correctamente."
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Clase Inválido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Prueba de creación de clase con código inválido",
+							"pm.test(\"Debe fallar por código inválido\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Matemáticas Básicas\",\n  \"codigo\": \"MAT10123\",\n  \"creditos\": 3,\n  \"usuario\": {\n    \"id\": {{usuarioIdProfesor}}\n  }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/clase",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"clase"
+					]
+				},
+				"description": "**Descripción:** Se intenta crear una clase con un código que no tiene 10 caracteres, lo cual debería ser rechazado por el sistema.\n\n**Razón de la prueba:** Este caso verifica que el sistema valide correctamente la longitud del código de la clase y devuelva un error adecuado cuando el código no tenga 10 caracteres.\n\n**Resultado Esperado:**\n\n- `400 Bad Request`: El código de la clase es inválido."
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar Clase por ID Válido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar que una clase por su ID sea encontrada correctamente",
+							"pm.test(\"Clase encontrada correctamente por ID\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('id', '{{claseId}}');",
+							"    console.log(\"Clase encontrada: \", jsonData);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/clase/{{claseId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"clase",
+						"{{claseId}}"
+					]
+				},
+				"description": "**Buscar Clase por ID Válido**\n\n**Descripción:** Se busca una clase utilizando un ID válido para confirmar que el sistema puede recuperar correctamente una clase existente.\n\n**Razón de la prueba:** Este caso valida que el sistema pueda retornar una clase válida cuando se le solicita usando un ID existente, asegurando que la consulta de clases por ID funcione correctamente.\n\n**Resultado Esperado:**\n\n- `200 OK`: Clase encontrada correctamente."
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar Clase por ID Inválido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar que una clase por su ID sea encontrada correctamente",
+							"pm.test(\"Clase encontrada correctamente por ID\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('id', '{{claseId}}');",
+							"    console.log(\"Clase encontrada: \", jsonData);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/clase/{{claseId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"clase",
+						"{{claseId}}"
+					]
+				},
+				"description": "### **Buscar Clase por ID Inválido**\n\n**Descripción:** Se intenta buscar una clase con un ID que no existe en la base de datos, lo que debería resultar en un error de \"Clase no encontrada\".\n\n**Razón de la prueba:** Este caso verifica que el sistema maneje correctamente las búsquedas con IDs que no existen, devolviendo un error adecuado cuando no se encuentra ninguna clase.\n\n**Resultado Esperado:**\n\n- `404 Not Found`: No se encontró ninguna clase con el ID proporcionado"
+			},
+			"response": []
+		}
+	]
+}
