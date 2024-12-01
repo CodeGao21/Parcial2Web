@@ -136,7 +136,7 @@ describe('UsuarioService', () => {
     });
 
     it('should successfully delete a user if no bonos and not Decana', async () => {
-      const usuario = { id: 1, rol: 'Profesor', bonos: [] } as UsuarioEntity;
+      const usuario = { id: 1, rol: 'Profesor' } as UsuarioEntity;
       mockUsuarioRepository.findOne.mockResolvedValue(usuario);
       mockUsuarioRepository.remove.mockResolvedValue(usuario);
 
